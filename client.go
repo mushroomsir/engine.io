@@ -1,6 +1,7 @@
 package engineio
 
 import (
+	"crypto/tls"
 	"net/url"
 
 	"github.com/gorilla/websocket"
@@ -9,10 +10,13 @@ import (
 
 // Options ...
 type Options struct {
+	// TLSClientConfig specifies the TLS configuration to use with tls.Client.
+	// If nil, the default configuration is used.
+	TLSClientConfig *tls.Config
 }
 
 // NewClient ...
-func NewClient(urlStr string, opts ...Options) (client *transports.Client, err error) {
+func NewClient(urlStr string, opts ...*Options) (client *transports.Client, err error) {
 	u, err := url.Parse(urlStr)
 	if err != nil {
 		return nil, err
@@ -22,8 +26,11 @@ func NewClient(urlStr string, opts ...Options) (client *transports.Client, err e
 	query.Set("EIO", "3")
 	u.RawQuery = query.Encode()
 
-	conn, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
-
+	dialer := &websocket.Dialer{}
+	if len(opts) > 0 {
+		dialer.TLSClientConfig = opts[0].TLSClientConfig
+	}
+	conn, _, err := dialer.Dial(u.String(), nil)
 	if err != nil {
 		return
 	}
