@@ -5,6 +5,8 @@ import (
 
 	"time"
 
+	"flag"
+
 	"github.com/mushroomsir/engine.io"
 )
 
@@ -18,8 +20,14 @@ func main() {
 	}
 	time.Sleep(time.Hour)
 }
+
+var ip = flag.String("ip", "127.0.0.1", "help message for flagname")
+
 func newClient() {
-	conn, err := engineio.NewClient("ws://localhost:4000/engine.io/")
+	flag.Parse()
+	conn, err := engineio.NewClient("ws://localhost:4001/engine.io/", &engineio.Options{
+		LocalAddr: *ip,
+	})
 	if err != nil {
 		log.Printf("newClient: %v", err)
 		return

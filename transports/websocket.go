@@ -40,6 +40,7 @@ func NewWebSocket(conn *websocket.Conn) *Client {
 		receiver: make(chan *Packet, 100),
 		Event:    make(chan *Event, 100),
 	}
+	client.done = make(chan bool)
 	go client.msgReceiveLoop()
 	go client.msgReadLoop()
 	return client
