@@ -21,13 +21,11 @@ func main() {
 	time.Sleep(time.Hour)
 }
 
-var ip = flag.String("ip", "127.0.0.1", "help message for flagname")
+var ip = flag.String("ip", "127.0.0.1:0", "help message for flagname")
 
 func newClient() {
 	flag.Parse()
-	conn, err := engineio.NewClient("ws://localhost:4001/engine.io/", &engineio.Options{
-		LocalAddr: *ip,
-	})
+	conn, err := engineio.NewClient("ws://127.0.0.1:4000/engine.io/")
 	if err != nil {
 		log.Printf("newClient: %v", err)
 		return
@@ -44,7 +42,8 @@ func newClient() {
 		case "error":
 			log.Println("Error:", string(event.Data))
 		case "open":
-			//log.Println("open:", conn.GetSID())
+			log.Println("open:", conn.GetSID())
+		case "ping":
 		default:
 			//log.Println(event)
 		}

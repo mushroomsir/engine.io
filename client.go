@@ -38,16 +38,13 @@ func NewClient(urlStr string, opts ...*Options) (client *transports.Client, err 
 		if op.TLSClientConfig != nil {
 			dialer.TLSClientConfig = op.TLSClientConfig
 		}
-		if op.LocalAddr != "" {
+		if len(op.LocalAddr) < 1 {
 			dialer.NetDial = func(network, addr string) (net.Conn, error) {
-				localAddr, err := net.ResolveIPAddr("ip", op.LocalAddr)
+				localAddr, err := net.ResolveTCPAddr(network, op.LocalAddr)
 				if err != nil {
 					panic(err)
 				}
-				localTCPAddr := net.TCPAddr{
-					IP: localAddr.IP,
-				}
-				netDialer := &net.Dialer{LocalAddr: &localTCPAddr}
+				netDialer := &net.Dialer{LocalAddr: localAddr}
 				return netDialer.Dial(network, addr)
 			}
 		}
